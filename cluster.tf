@@ -6,8 +6,48 @@ resource "aws_instance" "ec2" {
   subnet_id = aws_subnet.public.id
   associate_public_ip_address = true
   key_name = aws_key_pair.ec2_key_pair.key_name
+  vpc_security_group_ids = [aws_security_group.ec2_security_group.id]
 }
 
+resource "aws_security_group" "ec2_security_group" {
+  name        = "cluster-ec2-security-group"
+  vpc_id      = aws_vpc.primary.id
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+data "external" "install_control_plane" {
+  program = [
+    "bash", "install-control-plane.sh"
+  ]
+  query = {
+    k3s_ip = aws_instance.ec2[0].public_ip
+  }
+}
+
+output "k3s_token" { value = data.external.install_control_plane.result.k3s_token }
 output "ec2_ips" { value = [for i in aws_instance.ec2: i.public_ip] }
 
 resource "tls_private_key" "ssh_key" {
