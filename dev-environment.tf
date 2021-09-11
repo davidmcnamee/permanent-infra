@@ -30,6 +30,7 @@ resource "google_compute_instance" "dev_server" {
         brew install node yarn python gh go rustup docker minikube java bazelisk argocd tree helm terraform > ~/brew-install.log
         echo "${file("gh-access-token.txt")}" > ~/gh-access-token.txt
         gh auth login --with-token < ~/gh-access-token.txt
+        echo "StrictHostKeyChecking accept-new" >> ~/.ssh/config
         gh repo list -L 7 --json sshUrl | jq -r ".[] | .sshUrl" | while read repo; do git clone $repo; done
         git config --global pull.rebase true
         git config --global user.name "David McNamee"
