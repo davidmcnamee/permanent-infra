@@ -1,4 +1,10 @@
 
+# Permanent Infra
+
+I use terraform to provision infrastructure for side projects, dev environments, and school work. Leaving this here as a sample for others looking to do the same.
+
+
+
 ## Credentials
 Must have a `~/.aws/config` file present, in this format:
 ```
