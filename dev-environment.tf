@@ -31,7 +31,9 @@ resource "google_compute_instance" "dev_server" {
         gh auth login --with-token < ~/gh-access-token.txt
         echo "StrictHostKeyChecking accept-new" >> ~/.ssh/config
         gh repo list -L 7 --json sshUrl | jq -r ".[] | .sshUrl" | while read repo; do git clone $repo; done
-        brew install node yarn python go rustup docker minikube java bazelisk argocd tree helm terraform &>> ~/brew-install.log
+        brew install google-cloud-sdk &>> ~/brew-install.log
+        
+        brew install node yarn python go rustup docker skaffold minikube java bazelisk argocd tree helm terraform &>> ~/brew-install.log
         git config --global pull.rebase true
         git config --global user.name "David McNamee"
         git config --global user.email "d@vidmcnam.ee"
