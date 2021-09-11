@@ -1,5 +1,4 @@
 
-
 resource "google_compute_instance" "dev_server" {
   name         = "dev-server"
   machine_type = "e2-medium"
@@ -7,16 +6,13 @@ resource "google_compute_instance" "dev_server" {
   boot_disk {
     initialize_params {
       image = "ubuntu-os-cloud/ubuntu-2004-lts"
+      size = "60" # Gb
     }
   }
-
   network_interface {
     network = "default"
-    access_config {
-      // Ephemeral public IP
-    }
+    access_config {} // Ephemeral public IP
   }
-
   metadata = {
     ssh-keys = "davidmcnamee:${file("~/.ssh/id_rsa.pub")}\nroot:${file("~/.ssh/id_rsa.pub")}"
   }
@@ -25,7 +21,8 @@ resource "google_compute_instance" "dev_server" {
       #!/bin/bash
       sudo apt update -y
       sudo apt upgrade -y
-      sudo apt install gcc -y
+      sudo apt install gcc docker.io -y
+      sudo chmod 666 /var/run/docker.sock
       sudo su - davidmcnamee <<-'HEREDOC'
         echo | /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> ~/.profile
@@ -34,6 +31,9 @@ resource "google_compute_instance" "dev_server" {
         echo "${file("gh-access-token.txt")}" > ~/gh-access-token.txt
         gh auth login --with-token < ~/gh-access-token.txt
         gh repo list -L 7 --json sshUrl | jq -r ".[] | .sshUrl" | while read repo; do git clone $repo; done
+        git config --global pull.rebase true
+        git config --global user.name "David McNamee"
+        git config --global user.email "d@vidmcnam.ee"
       HEREDOC
   EOF
 }
