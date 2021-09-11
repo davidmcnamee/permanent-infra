@@ -1,7 +1,7 @@
 
 
 resource "google_compute_instance" "dev_server" {
-  name         = "davidmcnamee-dev-server"
+  name         = "dev-server"
   machine_type = "e2-medium"
   zone         = "us-central1-a"
   boot_disk {
@@ -25,11 +25,15 @@ resource "google_compute_instance" "dev_server" {
       #!/bin/bash
       sudo apt update -y
       sudo apt upgrade -y
+      sudo apt install gcc -y
       sudo su - davidmcnamee <<-'HEREDOC'
         echo | /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-        echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> /home/davidmcnamee/.profile
+        echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> ~/.profile
         eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-        brew install gcc yarn python gh
+        brew install node yarn python gh go rustup docker minikube java bazelisk argocd tree helm terraform > ~/brew-install.log
+        echo "${file("gh-access-token.txt")}" > ~/gh-access-token.txt
+        gh auth login --with-token < ~/gh-access-token.txt
+        gh repo list -L 7 --json sshUrl | jq -r ".[] | .sshUrl" | while read repo; do git clone $repo; done
       HEREDOC
   EOF
 }
