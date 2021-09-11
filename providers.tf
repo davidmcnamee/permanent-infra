@@ -33,6 +33,11 @@ provider "aws" {
   region = "us-east-1"
 }
 
+provider "google" {
+  project = "neon-notch-323820"
+  region = "us-central1"
+}
+
 resource "aws_s3_bucket" "backend_state" {
   bucket = "permanent-infra-backend-state"
   versioning {
