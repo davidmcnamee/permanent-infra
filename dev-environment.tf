@@ -15,17 +15,16 @@ resource "google_compute_instance" "dev_server" {
   }
   metadata = {
     ssh-keys = "davidmcnamee:${file("~/.ssh/id_rsa.pub")}\nroot:${file("~/.ssh/id_rsa.pub")}"
-  }
-
-  metadata_startup_script = <<-EOF
+    startup-script = <<-EOF
       #!/bin/bash
       sudo apt update -y
       sudo apt upgrade -y
       sudo apt install gcc docker.io -y
       sudo chmod 666 /var/run/docker.sock
+      sudo timedatectl set-timezone America/Toronto
       sudo su - davidmcnamee <<-'HEREDOC'
         echo | /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-        echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> ~/.profile
+        echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> ~/.bashrc
         eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
         brew install jq gh &>> ~/brew-install.log
         echo "${file("gh-access-token.txt")}" > ~/gh-access-token.txt
@@ -37,7 +36,8 @@ resource "google_compute_instance" "dev_server" {
         git config --global user.name "David McNamee"
         git config --global user.email "d@vidmcnam.ee"
       HEREDOC
-  EOF
+    EOF
+  }
 }
 
 data "external" "copy_ssh_key" {
