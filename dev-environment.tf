@@ -21,14 +21,11 @@ resource "google_compute_instance" "dev_server" {
     ssh-keys = "davidmcnamee:${file("~/.ssh/id_rsa.pub")}\nroot:${file("~/.ssh/id_rsa.pub")}"
   }
 
-  metadata_startup_script = <<EOF
+  metadata_startup_script = <<-EOF
       #!/bin/bash
       sudo apt update -y
       sudo apt upgrade -y
-      sudo su - davidmcnamee << HEREDOC
-        echo helloworld
-        whoami
-        export HOME=/home/davidmcnamee
+      sudo su - davidmcnamee <<-'HEREDOC'
         echo | /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> /home/davidmcnamee/.profile
         eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
