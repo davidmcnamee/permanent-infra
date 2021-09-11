@@ -14,9 +14,9 @@ if [[ $status_code == 1 ]]; then exit 1; fi
 ssh -o StrictHostKeyChecking=accept-new davidmcnamee@$IP 'mkdir -p ~/.aws' &> /dev/null
 scp -o StrictHostKeyChecking=accept-new ~/.aws/config davidmcnamee@$IP:~/.aws/config &> /dev/null
 if [[ $GOOGLE_APPLICATION_CREDENTIALS ]]; then
-    mkdir -p ~/.config
-    cp $GOOGLE_APPLICATION_CREDENTIALS ~/.config/application_default_credentials.json
+    mkdir -p ~/.config/gcloud
+    cp $GOOGLE_APPLICATION_CREDENTIALS ~/.config/gcloud/application_default_credentials.json
 fi
-ssh -o StrictHostKeyChecking=accept-new davidmcnamee@$IP 'mkdir -p ~/.config' &> /dev/null
+ssh -o StrictHostKeyChecking=accept-new davidmcnamee@$IP 'mkdir -p ~/.config/gcloud' &> /dev/null
 scp -o StrictHostKeyChecking=accept-new ~/.config/gcloud/application_default_credentials.json davidmcnamee@$IP:~/.config/gcloud/application_default_credentials.json &> /dev/null
 echo "{}"
