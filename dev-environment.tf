@@ -42,13 +42,15 @@ resource "google_compute_instance" "dev_server" {
       HEREDOC
     EOF
   }
+  tags = ["http-server","https-server"]
+  desired_status = "RUNNING"
 }
+locals { ip = google_compute_instance.dev_server.network_interface[0].access_config[0].nat_ip }
+output "ip" { value = local.ip }
 
 data "external" "copy_ssh_key" {
   program = ["bash", "copy-ssh-key.sh"]
   query = {
-    ip = google_compute_instance.dev_server.network_interface[0].access_config[0].nat_ip
+    ip = local.ip
   }
 }
-
-output "ip" { value = google_compute_instance.dev_server.network_interface[0].access_config[0].nat_ip }

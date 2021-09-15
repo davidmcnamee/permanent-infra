@@ -40,3 +40,7 @@ resource "google_container_node_pool" "cluster_nodes" {
     machine_type = "e2-micro"
   }
 }
+
+resource "google_compute_global_address" "external_ip" {
+  name = "davidmcnamee-gke-static-ip"
+}
