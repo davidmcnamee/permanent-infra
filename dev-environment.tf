@@ -9,10 +9,10 @@ resource "google_compute_instance" "dev_server" {
       size = "60" # Gb
     }
   }
-  network_interface {
-    network = "default"
-    access_config {} // Ephemeral public IP
-  }
+  # network_interface {
+  #   network = "default"
+  #   access_config {} // Ephemeral public IP
+  # }
   metadata = {
     ssh-keys = "davidmcnamee:${file("~/.ssh/id_rsa.pub")}\nroot:${file("~/.ssh/id_rsa.pub")}"
     startup-script = <<-EOF
@@ -32,7 +32,7 @@ resource "google_compute_instance" "dev_server" {
         echo "StrictHostKeyChecking accept-new" >> ~/.ssh/config
         gh repo list -L 7 --json sshUrl | jq -r ".[] | .sshUrl" | while read repo; do git clone $repo; done
         sudo snap install --classic google-cloud-sdk &>> ~/brew-install.log
-        gcloud auth activate-service-account --key-file=~/.config/gcloud/application_default_credentials.json &>> ~/brew-install.log
+        gcloud auth activate-service-account --key-file=$HOME/.config/gcloud/application_default_credentials.json &>> ~/brew-install.log
         echo 'alias gke-creds="gcloud container clusters get-credentials ${google_container_cluster.cluster.name} --region us-central1"' >> ~/.bashrc
         sudo apt install awscli -y &>> ~/brew-install.log
         brew install node yarn python go rustup docker minikube skaffold java bazelisk argocd tree helm terraform &>> ~/brew-install.log
@@ -44,7 +44,19 @@ resource "google_compute_instance" "dev_server" {
   }
   tags = ["http-server","https-server"]
   desired_status = "RUNNING"
+  can_ip_forward = true
+  network_interface {
+    network = "default"
+    access_config {
+      nat_ip = google_compute_address.dev_environment_static_ip.address
+    }
+  }
 }
+resource "google_compute_address" "dev_environment_static_ip" {
+  name = "dev-environment-static-ip"
+  region = "us-central1"
+}
+
 locals { ip = google_compute_instance.dev_server.network_interface[0].access_config[0].nat_ip }
 output "ip" { value = local.ip }
 

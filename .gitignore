@@ -1,3 +1,4 @@
 .terraform
 .terraform.*
 gh-access-token.txt
+*.pem

@@ -17,6 +17,10 @@ terraform {
       source = "hashicorp/external"
       version = "2.1.0"
     }
+    acme = {
+      source = "vancluever/acme"
+      version = "~> 2.0"
+    }
   }
   # backend resources are declared below. If provisioning from scratch, comment out
   # this backend section, and after applying run `terraform init` again to copy state.

@@ -37,10 +37,14 @@ resource "google_container_node_pool" "cluster_nodes" {
       "https://www.googleapis.com/auth/monitoring",
     ]
     labels       = { type = "cluster-node" }
-    machine_type = "e2-micro"
+    machine_type = "e2-medium"
   }
 }
 
 resource "google_compute_global_address" "external_ip" {
   name = "davidmcnamee-gke-static-ip"
+}
+
+output "gke_static_ip" {
+  value = google_compute_global_address.external_ip.address
 }
