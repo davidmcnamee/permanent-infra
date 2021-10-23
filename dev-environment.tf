@@ -6,7 +6,7 @@ resource "google_compute_instance" "dev_server" {
   boot_disk {
     initialize_params {
       image = "ubuntu-os-cloud/ubuntu-2004-lts"
-      size = "60" # Gb
+      size = "256" # Gb
     }
   }
   # network_interface {

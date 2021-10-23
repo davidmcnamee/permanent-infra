@@ -18,10 +18,10 @@ def main():
     ip = sys.argv[1]
     with open(expanduser('~/.ssh/config'), 'r') as f:
         lines = f.readlines()
-        i = find_hostname(lines, "Dev-Environment")
+        i = find_hostname(lines, "dev")
         if i is None:
             lines.extend([
-                "Host Dev-Environment\n",
+                "Host dev\n",
                 f"  HostName {ip}\n",
                 "  User davidmcnamee\n",
             ])

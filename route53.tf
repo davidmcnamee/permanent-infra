@@ -3,7 +3,20 @@ resource "aws_route53_zone" "main" {
   name = "vidmcnam.ee"
 }
 
+resource "aws_route53_zone" "groupshot" {
+  name = "groupshot.xyz"
+}
+
 output "dns_nameservers" { value = aws_route53_zone.main.name_servers }
+output "dns_nameservers_groupshot" { value = aws_route53_zone.groupshot.name_servers }
+
+resource "aws_route53_record" "groupshot_a" {
+  zone_id = aws_route53_zone.groupshot.zone_id
+  name    = "groupshot.xyz"
+  type    = "A"
+  ttl     = "300"
+  records = [google_compute_global_address.external_ip.address]
+}
 
 resource "aws_route53_record" "main_mx" {
   zone_id = aws_route53_zone.main.zone_id
@@ -101,6 +114,18 @@ resource "acme_certificate" "certificate2" {
   }
 }
 
+resource "acme_certificate" "groupshot_certificate" {
+  account_key_pem           = acme_registration.reg.account_key_pem
+  common_name               = "groupshot.xyz"
+
+  dns_challenge {
+    provider = "route53"
+    config = {
+      AWS_HOSTED_ZONE_ID    = aws_route53_zone.groupshot.zone_id
+    }
+  }
+}
+
 output "ssl_key" {
   sensitive = true
   value = acme_certificate.certificate.private_key_pem
@@ -117,4 +142,13 @@ output "ssl_key2" {
 output "ssl_cert2" {
   sensitive = true
   value = acme_certificate.certificate2.certificate_pem
+}
+
+output "groupshot_ssl_key" {
+  sensitive = true
+  value = acme_certificate.groupshot_certificate.private_key_pem
+}
+output "groupshot_ssl_cert" {
+  sensitive = true
+  value = acme_certificate.groupshot_certificate.certificate_pem
 }

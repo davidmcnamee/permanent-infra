@@ -38,7 +38,7 @@ provider "aws" {
 }
 
 provider "google" {
-  project = "neon-notch-323820"
+  project = "dynamic-digit-329900"
   region = "us-central1"
 }
 
