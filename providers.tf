@@ -38,10 +38,13 @@ provider "aws" {
 }
 
 provider "google" {
-  project = "dynamic-digit-329900"
+  project = "buoyant-insight-339103"
   region = "us-central1"
 }
 
+resource "google_project_service" "compute_service" {
+  service = "compute.googleapis.com"
+}
 resource "aws_s3_bucket" "backend_state" {
   bucket = "permanent-infra-backend-state"
   versioning {

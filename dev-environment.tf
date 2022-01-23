@@ -1,5 +1,8 @@
 
 resource "google_compute_instance" "dev_server" {
+  depends_on = [
+    google_project_service.compute_service
+  ]
   name         = "dev-server"
   machine_type = "e2-medium"
   zone         = "us-central1-a"
@@ -38,7 +41,7 @@ resource "google_compute_instance" "dev_server" {
         brew install node yarn python go rustup docker minikube skaffold java bazelisk argocd tree helm terraform &>> ~/brew-install.log
         git config --global pull.rebase true
         git config --global user.name "David McNamee"
-        git config --global user.email "d@vidmcnam.ee"
+        git config --global user.email "david@mcnamee.io"
       HEREDOC
     EOF
   }
@@ -51,8 +54,14 @@ resource "google_compute_instance" "dev_server" {
       nat_ip = google_compute_address.dev_environment_static_ip.address
     }
   }
+  # advanced_machine_features {
+  #   enable_nested_virtualization = true
+  # }
 }
 resource "google_compute_address" "dev_environment_static_ip" {
+  depends_on = [
+    google_project_service.compute_service
+  ]
   name = "dev-environment-static-ip"
   region = "us-central1"
 }
